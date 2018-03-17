@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hell yes, ASMR!{% endblock %}
+
+{% block body %}
+    <div class="app">
+        <div class="row">
+            <div class="col-md-2" v-if="searchExposed">
+                <div v-if="searchMode === 'video'">
+                    <input type="text" v-model="videoSearch.query" class="form-control" placeholder="Your search query...">
+                    <div v-if="videoSearch.finished" v-for="video in videos">
+                        <hr>
+                        <span class="badge badge-danger" v-if="video.nsfw">NSFW</span>
+                        <a href="javascript:void(0);" v-on:click="setVideo(video.youtubeId)">
+                            ${video.title}
+                        </a>
+                    </div>
+                    <div v-if="!videoSearch.finished">
+                        <hr>
+                        <center>
+                            Please wait...
+                        </center>
+                    </div>
+                    <hr>
+                    <b>Note: loading can take a bit, give it a few seconds.</b>
+                </div>
+            </div>
+            <div :class="'col-md-' + (searchExposed ? '10' : '12')">
+                <button class="btn btn-primary" v-on:click="searchExposed = !searchExposed">Toggle search (because this is a shitty beta)</button>
+                <br>
+                <center>
+                    <img src="{{ asset('assets/img/placeholder.jpg') }}" alt="Funny">
+                    <h3>This is a proof-of-concept, the UI is to be overhauled soon!</h3>
+                </center>
+            </div>
+        </div>
+    </div>
+    <div id="asmrVideo"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {% if app.environment == 'dev' %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.5.0/vue-resource.js"></script>
+    {% else %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.5.0/vue-resource.min.js"></script>
+    {% endif %}
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="{{ asset('assets/js/app.js') }}"></script>
+{% endblock %}
