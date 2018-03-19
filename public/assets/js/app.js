@@ -14,8 +14,15 @@ var app = new Vue({
             nsfw: true,
             finished: false
         },
+        currentVideo: {
+            title: 'No video playing...',
+            state: 'stopped',
+            video: null
+        },
+        volume: 100,
         searchExposed: false,
-        searchMode: 'video'
+        searchMode: 'video',
+        youtubePlayer: null
     },
     mounted: function() {
         this.fetchVideos();
@@ -44,11 +51,31 @@ var app = new Vue({
                 self.backgroundSearch.finished = true;
             });
         },
-        setVideo: function(youtubeId) {
+        setVideo: function(video) {
             // This is a reaaallly shitty way of doing this :(
-            var html = '<iframe class="saai" width="0" height="0" src="https://www.youtube.com/embed/' + youtubeId + '?autoplay=1" frameborder="0"></iframe>';
+            this.youtubePlayer.loadVideoById(video.youtubeId);
 
-            $('#asmrVideo').html(html);
+            this.currentVideo.title = video.title;
+            this.currentVideo.video = video;
+        },
+        play: function() {
+            this.youtubePlayer.playVideo();
+            this.currentVideo.state = 'playing';
+        },
+        stop: function() {
+            this.youtubePlayer.stopVideo();
+            this.currentVideo.state = 'stopped';
+        },
+        pause: function() {
+            this.youtubePlayer.pauseVideo();
+            this.currentVideo.state = 'paused';
+        },
+        updateVolume: function() {
+            this.youtubePlayer.setVolume(this.volume);
+        },
+        setVolume: function(val) {
+            this.volume = val;
+            this.updateVolume();
         }
     }
 });
@@ -56,3 +83,28 @@ var app = new Vue({
 // $(function() {
 //     app.mounted();
 // });
+
+function onYouTubePlayerAPIReady() {
+    app.youtubePlayer = new YT.Player('asmrVideo', {
+        height: '0',
+        width: '0',
+        events: {
+            // call this function when player is ready to use
+            'onReady': function() {
+            },
+            'onStateChange': function(event) {
+                switch(event.data) {
+                    case 0:
+                        app.currentVideo.state = 'stopped';
+                        break;
+                    case 1:
+                        app.setVolume(app.youtubePlayer.getVolume());
+                        app.currentVideo.state = 'playing';
+                        break;
+                    case 2:
+                        app.currentVideo.state = 'paused';
+                }
+            }
+        }
+    });
+}

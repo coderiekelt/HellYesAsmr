@@ -11,7 +11,7 @@
                     <div v-if="videoSearch.finished" v-for="video in videos">
                         <hr>
                         <span class="badge badge-danger" v-if="video.nsfw">NSFW</span>
-                        <a href="javascript:void(0);" v-on:click="setVideo(video.youtubeId)">
+                        <a href="javascript:void(0);" v-on:click="setVideo(video)">
                             ${video.title}
                         </a>
                     </div>
@@ -34,6 +34,41 @@
                 </center>
             </div>
         </div>
+        <div class="bottom-bar">
+            <span class="video-title">
+                <a class="control-button" :href="'http://youtu.be/' + currentVideo.video.youtubeId" v-if="currentVideo.video !== null">
+                    <span class="badge badge-danger" v-if="currentVideo.video.nsfw">
+                        ಠ_ಠ
+                    </span>
+                    ${currentVideo.title}
+                </a>
+                <span v-if="currentVideo.video === null">
+                    ${currentVideo.title}
+                </span>
+
+                <span class="pull-right controls">
+                <a href="javascript:void(0)" v-on:click="play" v-if="currentVideo.state == 'stopped' || currentVideo.state == 'paused'" class="control-button">
+                    <i class="fa fa-fw fa-play"></i>
+                </a>
+                <a href="javascript:void(0)" v-on:click="pause" v-if="currentVideo.state == 'playing'" class="control-button">
+                    <i class="fa fa-fw fa-pause"></i>
+                </a>
+                <a href="javascript:void(0)" v-on:click="stop" v-if="currentVideo.state == 'paused' || currentVideo.state == 'playing'" class="control-button">
+                    <i class="fa fa-fw fa-stop"></i>
+                </a>
+                    |
+                <a href="javascript:void(0)" v-on:click="setVolume(0)" v-if="volume > 0" class="control-button">
+                    <i class="fa fa-fw fa-volume-up"></i>
+                </a>
+                <a href="javascript:void(0)" v-on:click="setVolume(100)" v-if="volume < 1" class="control-button">
+                    <i class="fa fa-fw fa-volume-off"></i>
+                </a>
+                <span class="control-button">
+                    <input id="vol-control" type="range" min="0" max="100" step="1" v-model="volume" v-on:change="updateVolume"/>
+                </span>
+            </span>
+            </span>
+        </div>
     </div>
     <div id="asmrVideo"></div>
 {% endblock %}
@@ -49,5 +84,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.5.0/vue-resource.min.js"></script>
     {% endif %}
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://www.youtube.com/player_api"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 {% endblock %}
